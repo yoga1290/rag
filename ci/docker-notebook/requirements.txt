@@ -1,0 +1,25 @@
+gradio
+pypdf
+
+#faiss-cpu
+# SEE https://docs.langchain.com/oss/python/langchain/knowledge-base#2-embeddings
+#langchain-huggingface
+
+
+text-generation
+# SEE https://docs.langchain.com/oss/python/integrations/vectorstores#faiss
+
+# chromadb
+llama-cpp-python==0.3.16
+langchain==1.0.8
+langchain-community==0.4.1
+sentence-transformers==5.1.2
+chromadb==1.5.2
+langchain-chroma
+
+# for document processing
+langchain-unstructured==1.0.1
+unstructured==0.21.5
+
+yoga1290.rag==0.1.21
+langchain_postgres==0.0.17

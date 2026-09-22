@@ -1,0 +1,6 @@
+api
+application
+config
+domain
+factories
+infrastructure

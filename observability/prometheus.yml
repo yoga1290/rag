@@ -1,0 +1,13 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+
+  # Telegraf metrics from application container
+  - job_name: "telegraf"
+    static_configs:
+      - targets:
+          - "monitored-job:9273"
+        labels:
+          service: "rag-app"

@@ -1,0 +1,162 @@
+services:
+
+  notebook:
+    build:
+      context: ./ci/docker-notebook
+    depends_on:
+      postgres:
+        condition: service_healthy
+      sidecar-db-init:
+        condition: service_completed_successfully
+    env_file:
+      - sample.env
+    ports:
+      - 8888:8888 # jupyter
+    volumes:
+      - ./:/home/jovyan
+    networks:
+      - public
+      - private
+
+###########################################
+############## MONITORED JOB ##############
+###########################################
+  monitored-job:
+    container_name: monitored-job
+    user: root
+    depends_on:
+      - prometheus
+      - grafana
+    build:
+      context: ./ci/docker-telegraf-python
+    networks:
+      - monitoring
+      - public #TODO
+      # TODO: "unstructured" libarary may need internet connection
+      # SEE: https://github.com/explosion/spaCy/issues/6375
+    command:
+    - /bin/bash
+    - -c
+    - |
+      set -e
+      # pip install yoga1290.rag
+      
+      echo "Starting Telegraf..."
+      telegraf --config /etc/telegraf/telegraf.conf &
+      
+      echo "Starting receipt extraction..."
+      python app.py
+      wait 50000
+    ports:
+      - 9273:9273
+      - 8001:8000
+    env_file:
+      - sample.env
+    volumes:
+      - ./demo-app:/app:ro
+      - ./documents:/app/documents
+      - ./observability/telegraf.conf:/etc/telegraf/telegraf.conf
+      # - ./Mistral-7B-Instruct-v0.3.Q2_K.gguf:/app/Mistral-7B-Instruct-v0.3.Q2_K.gguf:ro
+    
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - monitoring
+      - public
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=yoga1290
+    networks:
+      - monitoring
+      - public
+    restart: unless-stopped
+#######################################################################
+  postgres:
+    image: pgvector/pgvector:pg16 #postgres:16
+    # container_name: postgres-db
+    restart: unless-stopped
+    env_file:
+      - sample.env
+    environment:
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: ["CMD-SHELL",
+              "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - private
+
+
+  sidecar-db-init:
+    image: postgres:16
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./initdb:/sql:ro
+    env_file:
+      - sample.env
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        psql \
+          "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB" \
+          -f /sql/001-init.sql
+    restart: "no"
+    networks:
+      - private
+###########################################
+  pull-documents:
+    # python:3.13-alpine + dependencies
+    image: ghcr.io/yoga1290/python-imap-smtp:26.04
+    container_name: pull-documents-imap
+    env_file:
+      - sample.env
+    environment:
+      - OUTPUT_DIR=${DOCUMENTS_PATH}
+      - FROM_EMAIL=<my-email>@gmail.com
+      - TO_EMAIL=<my-email>+RECEIPTS@gmail.com
+    volumes:
+      - ./${DOCUMENTS_PATH}:/usr/app/${DOCUMENTS_PATH}
+    networks:
+      - public
+
+
+networks:
+  public:
+  private:
+    internal: true
+  monitoring:
+    internal: true
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:

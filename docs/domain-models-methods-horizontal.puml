@@ -1,0 +1,114 @@
+@startuml
+
+title RAG Architecture - Ports & Models
+
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+' ============================================================
+' DOMAIN
+' ============================================================
+
+package "yoga1290.rag.domain.*" as Domain {
+
+    ' ========================================================
+    ' PORTS
+    ' Ordered left-to-right according to RAG pipeline
+    ' ========================================================
+
+    package "Ports" as Ports {
+
+        interface DocumentSource
+        interface DocumentParser
+        interface SearchPreparer
+        interface Embedder
+        interface VectorStore
+        interface Retriever
+        interface LLM
+
+        interface DocumentExtractor
+        interface DocumentClassifier
+    }
+
+    ' ========================================================
+    ' MODELS
+    ' Ordered left-to-right according to RAG pipeline
+    ' ========================================================
+
+    package "Models" as Models {
+
+        class Document
+        class ParsedDocument
+        class SearchDocument
+        class Chunk
+        class RagResult
+
+        class ExtractionSchema
+        class ExtractedData
+    }
+
+    ' ========================================================
+    ' PORT → MODEL RELATIONSHIPS
+    ' ========================================================
+
+    DocumentSource ..> Document
+
+    DocumentParser ..> Document
+    DocumentParser ..> ParsedDocument
+
+    SearchPreparer ..> ParsedDocument
+    SearchPreparer ..> SearchDocument
+    SearchPreparer ..> Chunk
+
+    Embedder ..> Chunk
+
+    VectorStore ..> SearchDocument
+    VectorStore ..> Chunk
+
+    Retriever ..> Chunk
+
+    LLM ..> RagResult
+
+    DocumentExtractor ..> ParsedDocument
+    DocumentExtractor ..> ExtractionSchema
+    DocumentExtractor ..> ExtractedData
+}
+
+' ============================================================
+' FORCE PORT ORDER — HORIZONTAL
+' ============================================================
+
+DocumentSource -[hidden]right-> DocumentParser
+DocumentParser -[hidden]right-> SearchPreparer
+SearchPreparer -[hidden]right-> Embedder
+Embedder -[hidden]right-> VectorStore
+VectorStore -[hidden]right-> Retriever
+Retriever -[hidden]right-> LLM
+
+' Optional document-processing ports after the main RAG flow
+LLM -[hidden]right-> DocumentExtractor
+DocumentExtractor -[hidden]right-> DocumentClassifier
+
+
+' ============================================================
+' FORCE MODEL ORDER — HORIZONTAL
+' ============================================================
+
+Document -[hidden]right-> ParsedDocument
+ParsedDocument -[hidden]right-> SearchDocument
+SearchDocument -[hidden]right-> Chunk
+Chunk -[hidden]right-> RagResult
+
+' Extraction models follow the main RAG models
+RagResult -[hidden]right-> ExtractionSchema
+ExtractionSchema -[hidden]right-> ExtractedData
+
+
+' ============================================================
+' KEEP PORTS ABOVE MODELS
+' ============================================================
+
+Ports -[hidden]down-> Models
+
+@enduml

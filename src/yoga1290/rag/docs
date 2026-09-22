@@ -1,0 +1,43 @@
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         APPLICATION LAYER                                   │
+│                                                                            │
+│  ┌─────────────────────┐             ┌──────────────────────┐             │
+│  │  DocumentPipeline   │             │   IndexingPipeline   │             │
+│  └──────────┬──────────┘             └──────────┬───────────┘             │
+│             │                                   │                         │
+└─────────────┼───────────────────────────────────┼─────────────────────────┘
+              │ depends on interfaces             │
+              ▼                                   ▼
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│                            DOMAIN / PORTS                                   │
+│                                                                            │
+│  <<interface>>       <<interface>>        <<interface>>                   │
+│  DocumentSource      DocumentParser       DocumentExtractor               │
+│        │                   │                     │                         │
+│        │                   │                     │                         │
+│  <<interface>>       <<interface>>        <<interface>>                   │
+│  DocumentClassifier  SearchPreparer       TextSplitter                    │
+│                                                                            │
+│  <<interface>>       <<interface>>                                        │
+│  Embedder             VectorStore                                          │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+              ▲                 ▲                 ▲
+              │ implements      │ implements      │ implements
+              │                 │                 │
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         INFRASTRUCTURE                                      │
+│                                                                            │
+│  DATBRICKS                    LOCAL                                         │
+│  ┌──────────────────────┐     ┌─────────────────────────────────────────┐ │
+│  │ DatabricksParser     │     │ DoclingDocumentParser                   │ │
+│  │ DatabricksExtractor  │     │ QwenDocumentExtractor                   │ │
+│  │ DatabricksClassifier │     │ QwenDocumentClassifier                  │ │
+│  │ DatabricksSearchPrep │     │ LocalSearchPreparer                     │ │
+│  └──────────────────────┘     │ RecursiveCharacterTextSplitter          │ │
+│                               │ QwenEmbedder / GTEEmbedder               │ │
+│                               │ PgVector / Milvus                        │ │
+│                               └─────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────────────────────────────┘

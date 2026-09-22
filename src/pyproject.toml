@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yoga1290.rag"
+readme = "readme.md"
+version = "0.1.22"
+description = "Hexagonal Architecture for Provider-Agnostic RAG Pipelines"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["./"]
+
+[project.urls]
+Homepage = "https://github.com/yoga1290/rag"
+Issues = "https://github.com/yoga1290/rag/issues"
