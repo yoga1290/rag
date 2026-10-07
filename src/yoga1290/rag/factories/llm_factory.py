@@ -26,7 +26,7 @@ class LLMFactory:
 
         context_size = int(
             # os.getenv("LLAMACPP_CONTEXT", "4096")
-            os.getenv("LLAMACPP_CONTEXT", "1096")
+            os.getenv("LLAMACPP_CONTEXT", "32768")
         )
 
         batch_size = int(

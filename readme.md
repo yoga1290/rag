@@ -187,7 +187,7 @@ from yoga1290.rag.domain.ports import (
                             DocumentParser,
                             DocumentExtractor,)
 ############################################################################
-from yoga1290.rag.infrastructure.local.extraction import LlamaCppDocumentExtractor
+from yoga1290.rag.infrastructure.local.extraction import LlamaCppMistralDocumentExtractor
 from yoga1290.rag.infrastructure.local.sources.csv_document_source import CsvDocumentSource
 from yoga1290.rag.infrastructure.local.parsing.local_document_parser import LocalDocumentParser
 
@@ -201,8 +201,9 @@ document_source: DocumentSource = (
 document_parser: DocumentParser = (
                     LocalDocumentParser())
 document_extractor: DocumentExtractor = (
-                    LlamaCppDocumentExtractor())
+                    LlamaCppMistralDocumentExtractor())
 
+table_data = []
 for document in document_source:
     parsed_document: ParsedDocument = (
                         document_parser.parse(document))
@@ -214,6 +215,10 @@ for document in document_source:
                                  'Item name',
                                  'Date of purchase'])
     print(f'response: {response}')
+    table_data.append(response.data)
+
+import pandas as pd
+pd.DataFrame(table_data)
 ```
 
 # 👁️ Container Observability

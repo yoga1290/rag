@@ -23,7 +23,6 @@ services:
 ###########################################
   monitored-job:
     container_name: monitored-job
-    user: root
     depends_on:
       - prometheus
       - grafana

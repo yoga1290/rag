@@ -1,5 +1,5 @@
-from .llama_cpp_document_extractor import LlamaCppDocumentExtractor
+from .llama_cpp_mistral_document_extractor import LlamaCppMistralDocumentExtractor
 
 __all__ = [
-    "LlamaCppDocumentExtractor",
+    "LlamaCppMistralDocumentExtractor",
 ]
