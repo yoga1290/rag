@@ -17,8 +17,8 @@ services:
     ports:
       - "8888:8888" # Jupyter
     volumes:
-      - ./:/home/jovyan/work
-      - ~/LLM:/LLM
+      - ./:/home/jovyan/work:rw
+      - ~/LLM:/LLM:ro
     networks:
       - public
       - private
@@ -147,13 +147,20 @@ services:
     env_file:
       - .env
     environment:
-      OUTPUT_DIR: "${DOCUMENTS_PATH}"
+      IMAP_OUTPUT_DIR: "${IMAP_OUTPUT_DIR}"
       # FROM_EMAIL: you@example.com
       TO_EMAIL: "youssef.shehab03@gmail.com"
       MAILBOX: "[Gmail]/Starred"
       # MAILBOX: INBOX
+    working_dir: /usr/app
+    command:
+      - python
+      - -c
+      - |
+        from yoga1290.emailtable import processIMAPToCSV
+        processIMAPToCSV()
     volumes:
-      - "./${DOCUMENTS_PATH}:/usr/app/${DOCUMENTS_PATH}"
+      - "./${IMAP_OUTPUT_DIR}:/usr/app/${IMAP_OUTPUT_DIR}"
     networks:
       - public
 

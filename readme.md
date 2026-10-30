@@ -19,7 +19,7 @@ def importOnCall(..):
     from.. import .. # Lazy import
     return ResultModel(..) # tied to Abstracts & Models
 ```
-Dependencies are wrapped as ["optional-dependencies"](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#dependencies-optional-dependencies) based on the desired inferastructure flavors, for instance `pip install yoga1290.rag[infrastructure-local-llama-postgres]` is a shortcut to install all dependencies required for that infrastructure; see [pyproject.toml](https://github.com/yoga1290/rag/blob/master/src/pyproject.toml#L52)
+Dependencies are wrapped as ["optional-dependencies"](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#dependencies-optional-dependencies) based on the desired inferastructure flavors, for instance `pip install yoga1290.rag[**infrastructure-local-llama-postgres**]` is a shortcut to install all dependencies required for that infrastructure; see [pyproject.toml](https://github.com/yoga1290/rag/blob/master/src/pyproject.toml#L52)
 
 - **🔌️ On-premise, hybrid & Multi-platform support** Decoupling from certain SDK or API or local implementations keep my options open to plug & play the document sources, different LLM models or vector stores/databases, regardless of being local, hybrid or on cloud services. 🖥️🔄☁️
 ```python
@@ -58,7 +58,7 @@ Startup this Jupiter notebook, PostgressSQL database & Promethus+Grafana servers
 
 
 ```python
-!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.32"
+!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.33"
 
 ########################### INTERFACES & MODELS ###########################
 from yoga1290.rag.domain.models import (
@@ -114,7 +114,7 @@ IngestionPipeline(
 
 
 ```python
-!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.32"
+!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.33"
 
 ########################### INTERFACES & MODELS ###########################
 from yoga1290.rag.domain.models import (
@@ -178,11 +178,11 @@ print(f"Answer {response.answer}")
 
 # 🏗️ Extraction Pipeline
 
-Here's an example of asking the LLM (Mistral on llamaCpp) to extract fields from my receipt emails pulled using [yoga1290/python-imap-smtp](https://github.com/yoga1290/python-imap-smtp/blob/main/notebook.ipynb) [see [`docker-compose.yml`](https://github.com/yoga1290/rag/blob/master/docker-compose.yml#L136)] that outputs to CSV table.
+Here's an example of asking the LLM (Mistral on llamaCpp) to extract fields from my receipt emails pulled using [yoga1290/python-emailtable](https://pypi.org/project/yoga1290.emailtable) [see [`compose.yaml`](https://github.com/yoga1290/rag/blob/master/compose.yaml#L144)] that outputs to CSV table.
 It simply generates inner prompt per each requested field and collects the responses into a dict map.
 
 ```python
-!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.32"
+!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.33"
 
 ########################### INTERFACES & MODELS ###########################
 from yoga1290.rag.domain.models import (
