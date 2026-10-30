@@ -19,6 +19,7 @@ def importOnCall(..):
     from.. import .. # Lazy import
     return ResultModel(..) # tied to Abstracts & Models
 ```
+Dependencies are wrapped as ["optional-dependencies"](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#dependencies-optional-dependencies) based on the desired inferastructure flavors, for instance `pip install yoga1290.rag[infrastructure-local-llama-postgres]` is a shortcut to install all dependencies required for that infrastructure; see [pyproject.toml](https://github.com/yoga1290/rag/blob/master/src/pyproject.toml#L52)
 
 - **🔌️ On-premise, hybrid & Multi-platform support** Decoupling from certain SDK or API or local implementations keep my options open to plug & play the document sources, different LLM models or vector stores/databases, regardless of being local, hybrid or on cloud services. 🖥️🔄☁️
 ```python
@@ -57,6 +58,8 @@ Startup this Jupiter notebook, PostgressSQL database & Promethus+Grafana servers
 
 
 ```python
+!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.32"
+
 ########################### INTERFACES & MODELS ###########################
 from yoga1290.rag.domain.models import (
                             Document,
@@ -111,6 +114,8 @@ IngestionPipeline(
 
 
 ```python
+!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.32"
+
 ########################### INTERFACES & MODELS ###########################
 from yoga1290.rag.domain.models import (
                             Document,
@@ -177,6 +182,8 @@ Here's an example of asking the LLM (Mistral on llamaCpp) to extract fields from
 It simply generates inner prompt per each requested field and collects the responses into a dict map.
 
 ```python
+!pip install "yoga1290.rag[infrastructure-local-llama-postgres]==0.1.32"
+
 ########################### INTERFACES & MODELS ###########################
 from yoga1290.rag.domain.models import (
                             ParsedDocument,
@@ -186,7 +193,7 @@ from yoga1290.rag.domain.ports import (
                             DocumentParser,
                             DocumentExtractor,)
 ############################################################################
-from yoga1290.rag.infrastructure.local.extraction import LlamaCppDocumentExtractor
+from yoga1290.rag.infrastructure.local.extraction import LlamaCppMistralDocumentExtractor
 from yoga1290.rag.infrastructure.local.sources.csv_document_source import CsvDocumentSource
 from yoga1290.rag.infrastructure.local.parsing.local_document_parser import LocalDocumentParser
 
@@ -200,8 +207,9 @@ document_source: DocumentSource = (
 document_parser: DocumentParser = (
                     LocalDocumentParser())
 document_extractor: DocumentExtractor = (
-                    LlamaCppDocumentExtractor())
+                    LlamaCppMistralDocumentExtractor())
 
+table_data = []
 for document in document_source:
     parsed_document: ParsedDocument = (
                         document_parser.parse(document))
@@ -213,11 +221,15 @@ for document in document_source:
                                  'Item name',
                                  'Date of purchase'])
     print(f'response: {response}')
+    table_data.append(response.data)
+
+import pandas as pd
+pd.DataFrame(table_data)
 ```
 
 # 👁️ Container Observability
 Monitoring the **resource consumption**, **network** traffic & **isolation** can ideicate how well different LLM models can perform under larger sets. 
-In my `docker-compose.yml` configuration, there're the following 3 containers:
+In my `compose.yaml` for **Root-less Podman** (recommended) or `docker-compose.yml` configuration for docker, there're the following 3 containers:
 + `monitored-job`: a container with Python & Telegraf pre-installed, see my [[Dockerfile]](https://github.com/yoga1290/rag/blob/master/ci/docker-telegraf-python/Dockerfile), [[docker-compose.yml]](https://github.com/yoga1290/rag/blob/master/docker-compose.yml#L24).  
 + `Promethus`: collecting metric data from the Telegraf server in the `monitored-job`
 + `Grafana`: for visualizing `Promethus` metrics into an intuitive dashboard; I used the [**Grafana's dashboard: System Metrics for the Linux Hosts**](https://grafana.com/grafana/dashboards/15365-system-metrics-for-the-linux-hosts/), which is compatible with Telegraf projected metrics but it needs a tweak:

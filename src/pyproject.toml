@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "yoga1290.rag"
 readme = "readme.md"
-version = "0.1.31"
+version = "0.1.32"
 description = "Hexagonal Architecture for Provider-Agnostic RAG Pipelines"
 requires-python = ">=3.11"
 
@@ -32,6 +32,7 @@ postgres = [
     "psycopg[binary]>=3.1",
     "pgvector>=0.2",
     "sqlalchemy>=2.0",
+    "langchain_postgres==0.0.19",
 ]
 
 # Local LLM support

@@ -35,3 +35,7 @@ responses/CAH9NQxP+P6N00qW3xC=+9jRb+KrYncErMD-m9A-ibVeTbiW0Ug@mail.gmail.com.txt
 responses/
 .documents/
 src/dist/
+.env
+
+src/build
+src/**.egg-info

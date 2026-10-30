@@ -57,11 +57,6 @@ class PGVectorStore(VectorStore):
         Embedder and persist the resulting vectors and metadata.
         """
 
-        # if not document.chunks:
-        #     return []
-        print(f'documents len: {len(documents)}')
-        print(f'documents[0].chunks len: {len(documents[0].chunks)}')
-
         langchain_documents, chunk_ids = (
             self._to_langchain_documents(documents)
         )
